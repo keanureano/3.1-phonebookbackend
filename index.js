@@ -1,7 +1,6 @@
 const { res, response } = require("express");
 const express = require("express");
-const app = express();
-
+const cors = require("cors");;
 const morgan = require("morgan");
 morgan.token("body", (req) => {
   if (Object.keys(req.body).length) {
@@ -9,7 +8,10 @@ morgan.token("body", (req) => {
   }
 });
 
+const app = express()
+
 app.use(
+  cors(),
   express.json(),
   morgan(":method :url :status :res[content-length] :response-time ms :body")
 );
