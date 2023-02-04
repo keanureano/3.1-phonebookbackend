@@ -2,6 +2,18 @@ const { res, response } = require("express");
 const express = require("express");
 const app = express();
 
+const morgan = require("morgan");
+morgan.token("body", (req) => {
+  if (Object.keys(req.body).length) {
+    return JSON.stringify(req.body);
+  }
+});
+
+app.use(
+  express.json(),
+  morgan(":method :url :status :res[content-length] :response-time ms :body")
+);
+
 let persons = [
   {
     id: 1,
@@ -24,8 +36,6 @@ let persons = [
     number: "39-23-6423122",
   },
 ];
-
-app.use(express.json(), requestLogger);
 
 app.get("/info", (req, res) => {
   const timeNow = new Date(Date.now());
@@ -69,25 +79,11 @@ app.delete("/api/persons/:id", (req, res) => {
   return res.status(204).end();
 });
 
-app.use(unknownEndpoint);
-
-function requestLogger(req, res, next) {
-  console.log("Method:", req.method);
-  console.log("Path:  ", req.path);
-  console.log("Body:  ", req.body);
-  console.log("---");
-  next();
-}
-
-function randomId() {
-  return Math.floor((Math.random() * Date.now()) / 10000000);
-}
-
-function unknownEndpoint(req, res) {
-  res.status(404).send({ error: "unknown endpoint" });
-}
-
 const port = 3001;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+function randomId() {
+  return Math.floor((Math.random() * Date.now()) / 10000000);
+}
