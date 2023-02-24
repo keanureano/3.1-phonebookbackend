@@ -27,14 +27,16 @@ app.get("/info", (req, res) => {
 });
 
 // get persons
-app.get("/api/persons", (req, res) => {
-  Person.find({}).then((persons) => {
-    return res.json(persons);
-  });
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+    .then((persons) => {
+      return res.json(persons);
+    })
+    .catch((error) => next(error));
 });
 
 // add person
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   if (!req.body.name) {
     return res.status(400).json({ error: "name missing" });
   }
@@ -42,35 +44,59 @@ app.post("/api/persons", (req, res) => {
     name: req.body.name,
     number: req.body.number || "",
   });
-  newPerson.save().then((person) => {
-    console.log(`added ${person.name} number ${person.number} to phonebook`);
-    return res.json(person);
-  });
+  newPerson
+    .save()
+    .then((person) => {
+      console.log(`added ${person.name} number ${person.number} to phonebook`);
+      return res.json(person);
+    })
+    .catch((error) => next(error));
 });
 
 // remove person
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
-  Person.findByIdAndDelete(id).then((result) => {
-    return res.status(204).end();
-  });
+  Person.findByIdAndDelete(id)
+    .then((result) => {
+      return res.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
-// // get person
-// app.get("/api/persons/:id", (req, res) => {
-//   const id = req.params.id
-//   const person = persons.find((person) => person.id === id);
-//   if (!person) {
-//     return res.status(404).end();
-//   }
-//   return res.json(person);
-// });
+// get person
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (!person) {
+        return res.status(404).end();
+      }
+      return res.json(note);
+    })
+    .catch((error) => next(error));
+});
 
+// unknown endpoint
+const unknownEdpoint = (req, res) => {
+  return res.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEdpoint);
+
+// error handler
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
+// port listener
 const port = 3001;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
-function randomId() {
-  return Math.floor((Math.random() * Date.now()) / 10000000);
-}
