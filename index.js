@@ -70,7 +70,16 @@ app.get("/api/persons/:id", (req, res, next) => {
       if (!person) {
         return res.status(404).end();
       }
-      return res.json(note);
+      return res.json(person);
+    })
+    .catch((error) => next(error));
+});
+
+// change person
+app.put("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    .then((person) => {
+      return res.json(person);
     })
     .catch((error) => next(error));
 });
