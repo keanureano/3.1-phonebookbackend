@@ -1,9 +1,37 @@
 DELETE http://localhost:3001/api/persons/4
 ###
+
 POST http://localhost:3001/api/persons
 content-type: application/json
 
 {
-    "name": "1",
-    "number": "number"
+    "name": "keanu",
+    "number": "09-1234556"
+}
+
+###
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "keanu",
+    "number": "040-22334455"
+}
+
+###
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "keanu",
+    "number": "1-22334455"
+}
+
+###
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "keanu",
+    "number": "10-22-334455"
 }
