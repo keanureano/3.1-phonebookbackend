@@ -22,7 +22,9 @@ app.use(
 app.get("/info", (req, res) => {
   const timeNow = new Date(Date.now());
   return res.send(`
-    <div>Phonebook has info for ${persons.length} people</div>
+    <div>Phonebook has info for
+    ${Person.find({}).then((persons) => persons.length)}
+    people</div>
     <div>${timeNow.toUTCString()}</div>`);
 });
 
@@ -54,7 +56,7 @@ app.post("/api/persons", (req, res, next) => {
 app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
   Person.findByIdAndDelete(id)
-    .then((result) => {
+    .then(() => {
       return res.status(204).end();
     })
     .catch((error) => next(error));
